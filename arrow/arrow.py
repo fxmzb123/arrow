@@ -163,7 +163,7 @@ class Arrow(object):
     # factories: ranges and spans
 
     @classmethod
-    def range(cls, frame, start, end=None, tz=None, limit=None):
+    def range(cls, frame, start, end=None, tz=None, limit=None, steps=None):
         ''' Returns an array of :class:`Arrow <arrow.arrow.Arrow>` objects, representing
         an iteration of time between two inputs.
 
@@ -172,6 +172,8 @@ class Arrow(object):
         :param end: (optional) A datetime expression, the end of the range.
         :param tz: (optional) A timezone expression.  Defaults to UTC.
         :param limit: (optional) A maximum number of tuples to return.
+        :param steps: (optional) A time steps used in the range. The step unit
+                                depends on the parameter frame.
 
         **NOTE**: the **end** or **limit** must be provided.  Call with **end** alone to
         return the entire range, with **limit** alone to return a maximum # of results from the
@@ -217,6 +219,9 @@ class Arrow(object):
         current = cls.fromdatetime(start)
         results = []
 
+        if steps is not None:
+            relative_steps = steps
+
         while current <= end and len(results) < limit:
             results.append(current)
 
@@ -224,7 +229,6 @@ class Arrow(object):
             current = cls(*values, tzinfo=tzinfo) + relativedelta(**{frame_relative: relative_steps})
 
         return results
-
 
     @classmethod
     def span_range(cls, frame, start, end, tz=None, limit=None):
